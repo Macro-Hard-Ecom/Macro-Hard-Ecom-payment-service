@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   payment-service:
-    image: ${ECR_IMAGE}
+    image: 993912191656.dkr.ecr.us-east-1.amazonaws.com/payment-service:latest
     container_name: payment-service
     ports:
       - "8084:8084"
