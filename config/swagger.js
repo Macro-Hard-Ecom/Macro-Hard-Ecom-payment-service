@@ -11,7 +11,7 @@ const options = {
     },
     servers: [
       { url: 'http://3.89.71.141:8084' },
-      { url: 'http://localhost:8084' }
+      // { url: 'http://localhost:8084' }
     ]
   },
   apis: ["./docs/*.js"]
