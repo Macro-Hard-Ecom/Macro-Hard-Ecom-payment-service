@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  payment-service:
+    image: ${ECR_IMAGE}
+    container_name: payment-service
+    ports:
+      - "8084:8084"
+    env_file:
+      - .env
+    restart: always
+
+# version: "3.9"
+
+# services:
+#   payment-service:
+#     build: .
+#     container_name: payment-service
+#     ports:
+#       - "8084:8084"
+#     env_file:
+#       - .env
+#     depends_on:
+#       - mongo
+#     networks:
+#       - ecommerce-network
+
+#   mongo:
+#     image: mongo:7
+#     container_name: payment-mongo
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - mongo_data:/data/db
+#     networks:
+#       - ecommerce-network
+
+# volumes:
+#   mongo_data:
+
+# networks:
+#   ecommerce-network:
+#     driver: bridge
