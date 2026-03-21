@@ -212,3 +212,17 @@
  *       500:
  *         description: Server error
  */
+
+/**
+ * @swagger
+ * /api/payments/testroute:
+ *   get:
+ *     summary: Test Route
+ *     tags: [Payments]
+ *     responses:
+ *       200:
+ *         description: Test Route
+ *   
+ *       500:
+ *         description: Server error
+ */

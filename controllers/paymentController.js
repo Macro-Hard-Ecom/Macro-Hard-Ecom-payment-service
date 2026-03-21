@@ -12,6 +12,8 @@ exports.processPayment = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    console.log(userResp)
+
     // Fetch order via Order Service
     const orderResp = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`);
     if (!orderResp.data) {
@@ -123,6 +125,17 @@ exports.paymentStats = async (req, res, next) => {
       refundedPayments,
       totalRevenue
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.testApi = async (req, res, next) => {
+  try {
+    res.json({
+      success : true,
+      message : "Api working"
+    })
   } catch (err) {
     next(err);
   }

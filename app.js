@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const cors = require("cors");
 const connectDB = require("./config/db");
 const paymentRoutes = require("./routes/paymentRoutes");
 const errorHandler = require("./middlewares/errorMiddleware");
@@ -9,6 +10,10 @@ dotenv.config();
 connectDB(process.env.MONGO_URI);
 
 const app = express();
+
+app.use(cors({
+  origin: 'http://4.240.88.4:8084' || 'http://localhost:8084/'
+}));
 app.use(express.json());
 
 // Routes
