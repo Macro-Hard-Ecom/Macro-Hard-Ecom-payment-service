@@ -12,7 +12,7 @@ connectDB(process.env.MONGO_URI);
 const app = express();
 
 app.use(cors({
-  origin: 'http://4.240.88.4:8084' || 'http://localhost:8084/'
+  origin: 'http://3.89.71.141:8084/' || 'http://localhost:8084/'
 }));
 app.use(express.json());
 
