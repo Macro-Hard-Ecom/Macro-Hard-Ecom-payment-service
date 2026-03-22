@@ -7,7 +7,7 @@ exports.processPayment = async (req, res, next) => {
     const { orderId, userId, amount, paymentMethod } = req.body;
 
     // Validate user via User Service
-    const userResp = await axios.get(`${process.env.USER_SERVICE_URL}/getUser/${userId}`);
+    const userResp = await axios.get(`${process.env.USER_SERVICE_URL}/api/users/${userId}`);
     if (!userResp.data) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -15,9 +15,13 @@ exports.processPayment = async (req, res, next) => {
     console.log(userResp)
 
     // Fetch order via Order Service
-    const orderResp = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`);
-    if (!orderResp.data) {
-      return res.status(404).json({ message: "Order not found" });
+    let orderResp;
+    try {
+      orderResp = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`);
+      if (!orderResp.data) return res.status(404).json({ message: "Order not found" });
+    } catch (err) {
+      console.warn("Order Service unavailable, proceeding anyway");
+      // Optionally: return res.status(503).json({ message: "Order Service unavailable" });
     }
 
     // Simulate payment
@@ -30,10 +34,14 @@ exports.processPayment = async (req, res, next) => {
 
     // Update order status if payment successful
     if (status === "success") {
-      await axios.put(`${process.env.ORDER_SERVICE_URL}/order/updateStatus`, {
-        orderId,
-        status: "paid"
-      });
+      try {
+        await axios.put(`${process.env.ORDER_SERVICE_URL}/order/updateStatus`, {
+          orderId,
+          status: "paid"
+        });
+      } catch (err) {
+        console.warn("Order Service unavailable, could not update order status");
+      }
     }
 
     res.status(201).json({ success: true, payment });
@@ -66,11 +74,15 @@ exports.refundPayment = async (req, res, next) => {
     await payment.save();
 
     // Notify Order Service
-    await axios.put(`${process.env.ORDER_SERVICE_URL}/order/updateStatus`, {
-      orderId: payment.orderId,
-      status: "refunded",
-      reason
-    });
+    try {
+      await axios.put(`${process.env.ORDER_SERVICE_URL}/order/updateStatus`, {
+        orderId: payment.orderId,
+        status: "refunded",
+        reason
+      });
+    } catch (err) {
+      console.warn("Order Service unavailable, could not notify of refund");
+    }
 
     res.json({ success: true, payment });
   } catch (err) {
@@ -133,8 +145,8 @@ exports.paymentStats = async (req, res, next) => {
 exports.testApi = async (req, res, next) => {
   try {
     res.json({
-      success : true,
-      message : "Api working"
+      success: true,
+      message: "Api working"
     })
   } catch (err) {
     next(err);
