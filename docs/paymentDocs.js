@@ -17,18 +17,15 @@
  *       required:
  *         - orderId
  *         - userId
- *         - amount
  *         - paymentMethod
  *       properties:
  *         orderId:
  *           type: string
  *         userId:
  *           type: string
- *         amount:
- *           type: number
  *         paymentMethod:
  *           type: string
- *           enum: [card, paypal, mock]
+ *           enum: [card, paypal]
  *
  *     RefundRequest:
  *       type: object
@@ -105,6 +102,7 @@
  * /api/payments/processPayment:
  *   post:
  *     summary: Process a payment
+ *     description: Amount is automatically calculated from the order. No need to pass amount in the request body.
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
@@ -114,6 +112,10 @@
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/PaymentRequest'
+ *           example:
+ *             orderId: "69bfd29e0ef8157366092f4d"
+ *             userId: "shaheedwajee@gmail.com"
+ *             paymentMethod: "card"
  *     responses:
  *       201:
  *         description: Payment processed successfully
@@ -125,6 +127,8 @@
  *         description: Unauthorized
  *       404:
  *         description: User or Order not found
+ *       503:
+ *         description: Order Service unavailable
  *       500:
  *         description: Server error
  */
@@ -143,7 +147,7 @@
  *         required: true
  *         schema:
  *           type: string
- *         description: ID of the payment
+ *         description: UUID of the payment (paymentId field, not MongoDB _id)
  *     responses:
  *       200:
  *         description: Payment found
@@ -171,6 +175,9 @@
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/RefundRequest'
+ *           example:
+ *             paymentId: "a556fef7-c514-4b73-86a3-e653810f5b0d"
+ *             reason: "Customer requested refund"
  *     responses:
  *       200:
  *         description: Payment refunded successfully

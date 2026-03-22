@@ -4,26 +4,29 @@ const Payment = require("../models/Payment");
 // Process a payment
 exports.processPayment = async (req, res, next) => {
   try {
-    const { orderId, userId, amount, paymentMethod } = req.body;
+    const { orderId, paymentMethod } = req.body;
+    const userId = req.user?.userId || req.user?.sub;
 
-    // Validate user via User Service
-    const userResp = await axios.get(`${process.env.USER_SERVICE_URL}/api/users/${userId}`, {
-      headers: { Authorization: req.headers.authorization },
-    });
-    if (!userResp.data) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Fetch order via Order Service
-    let orderResp;
+    // Fetch order via Order Service — required to get the amount
+    let order;
     try {
-      orderResp = await axios.get(
+      const orderResp = await axios.get(
         `${process.env.ORDER_SERVICE_URL}/api/orders/order/${orderId}`,
         { headers: { Authorization: req.headers.authorization } }
       );
-      if (!orderResp.data) return res.status(404).json({ message: "Order not found" });
+      if (!orderResp.data) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      order = orderResp.data;
     } catch (err) {
-      console.warn("Order Service unavailable, proceeding anyway");
+      return res.status(503).json({ message: "Order Service unavailable, cannot process payment" });
+    }
+
+    // Use totalAmount directly from the order
+    const amount = order.totalAmount;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ message: "Invalid order amount" });
     }
 
     // Simulate payment
@@ -57,7 +60,7 @@ exports.processPayment = async (req, res, next) => {
 exports.paymentStatus = async (req, res, next) => {
   try {
     const { paymentId } = req.params;
-    const payment = await Payment.findById(paymentId);
+    const payment = await Payment.findOne({ paymentId });
     if (!payment) return res.status(404).json({ message: "Payment not found" });
     res.json({ success: true, payment });
   } catch (err) {
@@ -70,7 +73,7 @@ exports.refundPayment = async (req, res, next) => {
   try {
     const { paymentId, reason } = req.body;
 
-    const payment = await Payment.findById(paymentId);
+    const payment = await Payment.findOne({ paymentId });
     if (!payment) return res.status(404).json({ message: "Payment not found" });
 
     payment.status = "refunded";
