@@ -7,21 +7,23 @@ exports.processPayment = async (req, res, next) => {
     const { orderId, userId, amount, paymentMethod } = req.body;
 
     // Validate user via User Service
-    const userResp = await axios.get(`${process.env.USER_SERVICE_URL}/api/users/${userId}`);
+    const userResp = await axios.get(`${process.env.USER_SERVICE_URL}/api/users/${userId}`, {
+      headers: { Authorization: req.headers.authorization },
+    });
     if (!userResp.data) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log(userResp)
-
     // Fetch order via Order Service
     let orderResp;
     try {
-      orderResp = await axios.get(`${process.env.ORDER_SERVICE_URL}/order/${orderId}`);
+      orderResp = await axios.get(
+        `${process.env.ORDER_SERVICE_URL}/api/orders/order/${orderId}`,
+        { headers: { Authorization: req.headers.authorization } }
+      );
       if (!orderResp.data) return res.status(404).json({ message: "Order not found" });
     } catch (err) {
       console.warn("Order Service unavailable, proceeding anyway");
-      // Optionally: return res.status(503).json({ message: "Order Service unavailable" });
     }
 
     // Simulate payment
@@ -35,10 +37,11 @@ exports.processPayment = async (req, res, next) => {
     // Update order status if payment successful
     if (status === "success") {
       try {
-        await axios.put(`${process.env.ORDER_SERVICE_URL}/order/updateStatus`, {
-          orderId,
-          status: "paid"
-        });
+        await axios.put(
+          `${process.env.ORDER_SERVICE_URL}/api/orders/order/${orderId}/status`,
+          { status: "Paid" },
+          { headers: { Authorization: req.headers.authorization } }
+        );
       } catch (err) {
         console.warn("Order Service unavailable, could not update order status");
       }
@@ -54,7 +57,7 @@ exports.processPayment = async (req, res, next) => {
 exports.paymentStatus = async (req, res, next) => {
   try {
     const { paymentId } = req.params;
-    const payment = await Payment.findOne({ paymentId });
+    const payment = await Payment.findById(paymentId);
     if (!payment) return res.status(404).json({ message: "Payment not found" });
     res.json({ success: true, payment });
   } catch (err) {
@@ -67,7 +70,7 @@ exports.refundPayment = async (req, res, next) => {
   try {
     const { paymentId, reason } = req.body;
 
-    const payment = await Payment.findOne({ paymentId });
+    const payment = await Payment.findById(paymentId);
     if (!payment) return res.status(404).json({ message: "Payment not found" });
 
     payment.status = "refunded";
@@ -75,11 +78,11 @@ exports.refundPayment = async (req, res, next) => {
 
     // Notify Order Service
     try {
-      await axios.put(`${process.env.ORDER_SERVICE_URL}/order/updateStatus`, {
-        orderId: payment.orderId,
-        status: "refunded",
-        reason
-      });
+      await axios.put(
+        `${process.env.ORDER_SERVICE_URL}/api/orders/order/${payment.orderId}/status`,
+        { status: "Refunded" },
+        { headers: { Authorization: req.headers.authorization } }
+      );
     } catch (err) {
       console.warn("Order Service unavailable, could not notify of refund");
     }
@@ -108,7 +111,7 @@ exports.paymentLogs = async (req, res, next) => {
       page,
       limit,
       total,
-      payments
+      payments,
     });
   } catch (err) {
     next(err);
@@ -125,7 +128,7 @@ exports.paymentStats = async (req, res, next) => {
 
     const revenueAgg = await Payment.aggregate([
       { $match: { status: "success" } },
-      { $group: { _id: null, totalRevenue: { $sum: "$amount" } } }
+      { $group: { _id: null, totalRevenue: { $sum: "$amount" } } },
     ]);
     const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
 
@@ -135,7 +138,7 @@ exports.paymentStats = async (req, res, next) => {
       successfulPayments,
       failedPayments,
       refundedPayments,
-      totalRevenue
+      totalRevenue,
     });
   } catch (err) {
     next(err);
@@ -146,8 +149,8 @@ exports.testApi = async (req, res, next) => {
   try {
     res.json({
       success: true,
-      message: "Api working"
-    })
+      message: "Api working",
+    });
   } catch (err) {
     next(err);
   }

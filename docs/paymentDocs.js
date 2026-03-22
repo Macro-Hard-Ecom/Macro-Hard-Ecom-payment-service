@@ -5,6 +5,12 @@
  *   description: Payment management endpoints
  *
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *
  *   schemas:
  *     PaymentRequest:
  *       type: object
@@ -100,6 +106,8 @@
  *   post:
  *     summary: Process a payment
  *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -113,6 +121,8 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PaymentResponse'
+ *       401:
+ *         description: Unauthorized
  *       404:
  *         description: User or Order not found
  *       500:
@@ -125,6 +135,8 @@
  *   get:
  *     summary: Get payment status/details
  *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: paymentId
@@ -139,6 +151,8 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PaymentResponse'
+ *       401:
+ *         description: Unauthorized
  *       404:
  *         description: Payment not found
  */
@@ -149,6 +163,8 @@
  *   post:
  *     summary: Refund a payment
  *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -162,6 +178,8 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PaymentResponse'
+ *       401:
+ *         description: Unauthorized
  *       404:
  *         description: Payment not found
  *       500:
@@ -174,6 +192,8 @@
  *   get:
  *     summary: Get all payment logs with pagination
  *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -192,6 +212,8 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PaymentLogsResponse'
+ *       401:
+ *         description: Unauthorized
  *       500:
  *         description: Server error
  */
@@ -202,6 +224,8 @@
  *   get:
  *     summary: Get payment statistics
  *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Payment statistics
@@ -209,6 +233,8 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/PaymentStatsResponse'
+ *       401:
+ *         description: Unauthorized
  *       500:
  *         description: Server error
  */
@@ -222,7 +248,6 @@
  *     responses:
  *       200:
  *         description: Test Route
- *   
  *       500:
  *         description: Server error
  */

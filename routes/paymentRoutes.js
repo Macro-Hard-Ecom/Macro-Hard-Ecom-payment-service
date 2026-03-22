@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const paymentController = require("../controllers/paymentController");
+const { protect } = require("../middlewares/authMiddleware");
 
 /**
  * @swagger
@@ -9,11 +10,11 @@ const paymentController = require("../controllers/paymentController");
  *   description: Payment management endpoints
  */
 
-router.post("/processPayment", paymentController.processPayment);
-router.get("/paymentStatus/:paymentId", paymentController.paymentStatus);
-router.post("/refundPayment", paymentController.refundPayment);
-router.get("/paymentLogs", paymentController.paymentLogs);
-router.get("/paymentStats", paymentController.paymentStats);
+router.post("/processPayment", protect, paymentController.processPayment);
+router.get("/paymentStatus/:paymentId", protect, paymentController.paymentStatus);
+router.post("/refundPayment", protect, paymentController.refundPayment);
+router.get("/paymentLogs", protect, paymentController.paymentLogs);
+router.get("/paymentStats", protect, paymentController.paymentStats);
 router.get("/testroute", paymentController.testApi);
 
 module.exports = router;
