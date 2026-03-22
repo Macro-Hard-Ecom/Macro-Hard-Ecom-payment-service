@@ -85,4 +85,5 @@ jobs:
               docker login --username AWS --password-stdin \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
             docker-compose down
+            docker-compose pull
             docker-compose up -d
