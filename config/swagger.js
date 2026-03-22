@@ -12,7 +12,16 @@ const options = {
     servers: [
       { url: 'http://3.89.71.141:8084' },
       { url: 'http://localhost:8084' }
-    ]
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT"
+        }
+      }
+    }
   },
   apis: ["./docs/*.js"]
 };

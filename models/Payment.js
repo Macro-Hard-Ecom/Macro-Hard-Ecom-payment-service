@@ -7,7 +7,7 @@ const PaymentSchema = new mongoose.Schema(
     orderId: { type: String, required: true },
     userId: { type: String, required: true },
     amount: { type: Number, required: true },
-    paymentMethod: { type: String, enum: ["card", "paypal", "mock"], required: true },
+    paymentMethod: { type: String, enum: ["card", "banktranfer"], required: true },
     status: { type: String, enum: ["pending", "success", "failed", "refunded"], default: "pending" }
   },
   { timestamps: true }
