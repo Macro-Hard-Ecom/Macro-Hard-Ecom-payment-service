@@ -148,6 +148,29 @@ exports.paymentStats = async (req, res, next) => {
   }
 };
 
+// Get payments by user ID
+exports.getPaymentsByUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const payments = await Payment.find({ userId }).sort({ createdAt: -1 });
+    res.json({ success: true, count: payments.length, payments });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Get payment by order ID
+exports.getPaymentByOrder = async (req, res, next) => {
+  try {
+    const { orderId } = req.params;
+    const payment = await Payment.findOne({ orderId });
+    if (!payment) return res.status(404).json({ message: "Payment not found for this order" });
+    res.json({ success: true, payment });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.testApi = async (req, res, next) => {
   try {
     res.json({

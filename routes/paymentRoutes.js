@@ -15,6 +15,8 @@ router.get("/paymentStatus/:paymentId", protect, paymentController.paymentStatus
 router.post("/refundPayment", protect, paymentController.refundPayment);
 router.get("/paymentLogs", protect, paymentController.paymentLogs);
 router.get("/paymentStats", protect, paymentController.paymentStats);
+router.get("/user/:userId", protect, paymentController.getPaymentsByUser);
+router.get("/order/:orderId", protect, paymentController.getPaymentByOrder);
 router.get("/testroute", paymentController.testApi);
 
 module.exports = router;

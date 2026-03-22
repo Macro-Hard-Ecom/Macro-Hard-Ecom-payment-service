@@ -258,3 +258,61 @@
  *       500:
  *         description: Server error
  */
+
+/**
+ * @swagger
+ * /api/payments/user/{userId}:
+ *   get:
+ *     summary: Get all payments for a specific user
+ *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID (email or ID from JWT)
+ *     responses:
+ *       200:
+ *         description: List of payments for the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaymentLogsResponse'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+
+/**
+ * @swagger
+ * /api/payments/order/{orderId}:
+ *   get:
+ *     summary: Get payment details for a specific order
+ *     tags: [Payments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Order ID
+ *     responses:
+ *       200:
+ *         description: Payment details for the order
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaymentResponse'
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Payment not found for this order
+ *       500:
+ *         description: Server error
+ */
