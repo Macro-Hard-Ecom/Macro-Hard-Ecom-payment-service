@@ -10,7 +10,7 @@ const options = {
       description: "Payment microservice for E-commerce system"
     },
     servers: [
-      { url: 'http://3.89.71.141:8084' },
+      { url: 'http://3.80.46.136:8084' },
       { url: 'http://localhost:8084' }
     ],
     components: {
