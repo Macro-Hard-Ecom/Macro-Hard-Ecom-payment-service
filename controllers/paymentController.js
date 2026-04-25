@@ -31,10 +31,9 @@ exports.processPayment = async (req, res, next) => {
 
     // Simulate payment
     let status = "failed";
-    if (paymentMethod === "mock" || Math.random() > 0.1) {
+    if (Math.random() > 0.1) {
       status = "success";
     }
-
     const payment = await Payment.create({ orderId, userId, amount, paymentMethod, status });
 
     // Update order status if payment successful
@@ -152,6 +151,8 @@ exports.paymentStats = async (req, res, next) => {
 exports.getPaymentsByUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
+    const all = await Payment.find({}).limit(5).select('userId');
+    console.log(all);
     const payments = await Payment.find({ userId }).sort({ createdAt: -1 });
     res.json({ success: true, count: payments.length, payments });
   } catch (err) {
@@ -171,8 +172,11 @@ exports.getPaymentByOrder = async (req, res, next) => {
   }
 };
 
+// Test
+
 exports.testApi = async (req, res, next) => {
   try {
+    console.log("Test API hit");
     res.json({
       success: true,
       message: "Api working",
